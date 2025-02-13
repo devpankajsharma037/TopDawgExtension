@@ -1,15 +1,16 @@
-import React from 'react'
-import style  from '../../utils/style'
-import Grid from '@mui/material/Grid2';
+import React from "react";
+import Grid from "@mui/material/Grid2";
+import Login from "../screens/Login";
 
-export default function Guest() {
+export default function Guest({ setIsLoggedIn }) {
   return (
-    <Grid container>
+    <Grid
+      container
+      sx={{ height: "100%", justifyContent: "center", alignItems: "center" }}
+    >
       <Grid size={12}>
-        <Grid container>
-            <Grid size={12}>Test</Grid>
-        </Grid>
+        <Login setIsLoggedIn={setIsLoggedIn} />
       </Grid>
     </Grid>
-  )
+  );
 }
