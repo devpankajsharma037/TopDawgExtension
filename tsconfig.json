@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "module": "es6",
+        "target": "es6",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+    },
+    "include": ["src/**/*.ts", "src/**/*.tsx", "src/options/option.tsx", "src/contentscript/contentScript.tsx", "src/component/Logo.tsx"],
+    "exclude": ["node_modules"],
+}
