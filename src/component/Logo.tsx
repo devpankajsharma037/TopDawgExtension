@@ -7,7 +7,7 @@ export default function Logo(props) {
       alt={alt}
       width={width}
       height={height}
-      src={chrome.runtime.getURL("images/logo.png")}
+      src={chrome.runtime.getURL("images/icon.png")}
     />
   );
 }
