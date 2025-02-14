@@ -1,4 +1,23 @@
-body{
-    margin: 0px;
-    font-family:Inter;
+body {
+  margin: 0px;
+  font-family: Inter;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #fcf6ba, #bf953f);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, rgb(245, 241, 196), #bf953f);
 }

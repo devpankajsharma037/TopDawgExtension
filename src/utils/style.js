@@ -25,7 +25,7 @@ let style = {
   popupMainContent: {
     height: "calc(100vh - 130px)",
     padding: "20px",
-    overflow: "scroll",
+    overflow: "auto",
   },
   popupFormInput: {
     backgroundColor: "#fff",
