@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,6 +28,14 @@ const UserDetails = () => {
       notes: "",
     },
   });
+
+  useEffect(() => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs.length > 0) {
+        console.log(tabs[0].url || "No URL found");
+      }
+    });
+  }, []);
 
   const onSubmit: SubmitHandler<UserDetailsFormData> = (data) => {
     console.log("Form submitted:", data);
