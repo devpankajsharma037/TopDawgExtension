@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import { Box, Typography } from "@mui/material";
 import style from "../../utils/style";
 import { ContainedButton } from "../../component/Button";
 import FormInput from "../../component/FormInput";
 import { authSchema } from "../../utils/validation";
+import { loginService } from "../../utils/service";
+import CustomSnackbar from "../../component/CustomSnackbar";
 
 const Login = ({ setIsLoggedIn }) => {
   const { popupFormLable, popupFormLayout, submitUserDetailButton } = style;
@@ -16,18 +18,34 @@ const Login = ({ setIsLoggedIn }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<AuthSchema>({
     resolver: zodResolver(authSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
 
-  const onSubmit: SubmitHandler<AuthSchema> = (data) => {
-    console.log("Form submitted:", data);
-    setIsLoggedIn(true);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [loginSuccess, setLoginSuccess] = useState(false);
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
+  const onSubmit: SubmitHandler<AuthSchema> = async (data) => {
+    setSnackbarOpen(true);
+    setLoginSuccess(false);
+    const response = await loginService(data.username, data.password);
+    setLoginSuccess(response.success);
+    if (response.success) {
+      setIsLoggedIn(response.accessToken);
+      setSnackbarMessage("Login Success");
+    } else {
+      setSnackbarMessage(response.message);
+    }
   };
 
   return (
@@ -37,21 +55,26 @@ const Login = ({ setIsLoggedIn }) => {
       onSubmit={handleSubmit(onSubmit)}
     >
       {[
-        { name: "email", type: "email", label: "Email", placeholder: "Email" },
+        {
+          name: "username",
+          type: "text",
+          label: "Username",
+          placeholder: "Username",
+        },
         {
           name: "password",
           type: "password",
           label: "Password",
-          placeholder: "password",
+          placeholder: "Password",
         },
       ].map(({ name, type, label, placeholder }) => (
         <Grid container key={name} spacing={2} alignItems="flex-start">
-          <Grid size={3}>
+          <Grid item xs={3}>
             <Typography sx={popupFormLable} variant="caption">
               {label}:
             </Typography>
           </Grid>
-          <Grid size={9}>
+          <Grid item xs={9}>
             <FormInput
               type={type}
               {...register(name as any)}
@@ -61,9 +84,22 @@ const Login = ({ setIsLoggedIn }) => {
           </Grid>
         </Grid>
       ))}
-      <ContainedButton customStyle={submitUserDetailButton} type="submit">
-        Submit
+
+      <ContainedButton
+        customStyle={submitUserDetailButton}
+        type="submit"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? "Submitting..." : "Submit"}
       </ContainedButton>
+      {snackbarMessage && (
+        <CustomSnackbar
+          message={snackbarMessage}
+          open={snackbarOpen}
+          onClose={handleCloseSnackbar}
+          severity={loginSuccess ? "success" : "error"}
+        />
+      )}
     </Box>
   );
 };

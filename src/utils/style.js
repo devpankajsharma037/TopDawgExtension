@@ -25,7 +25,7 @@ let style = {
   popupMainContent: {
     height: "calc(100vh - 130px)",
     padding: "20px",
-    overflow: "scroll",
+    overflow: "auto",
   },
   popupFormInput: {
     backgroundColor: "#fff",
@@ -72,6 +72,11 @@ let style = {
     maxWidth: "fit-content",
     display: "block",
     marginLeft: "auto",
+  },
+  logoutButton: {
+    position: "absolute",
+    top: "25px",
+    right: "20px",
   },
 };
 export default style;

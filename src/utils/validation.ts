@@ -15,6 +15,6 @@ export const userDetailsSchema = z.object({
 });
 
 export const authSchema = z.object({
-  email: emailSchema().shape.email,
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(6, "Password is required"),
 });
