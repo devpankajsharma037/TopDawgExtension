@@ -9,6 +9,7 @@ import { ContainedButton } from "../../component/Button";
 import FormInput from "../../component/FormInput";
 import { authSchema } from "../../utils/validation";
 import { loginService } from "../../utils/service";
+import CustomSnackbar from "../../component/CustomSnackbar";
 
 const Login = ({ setIsLoggedIn }) => {
   const { popupFormLable, popupFormLayout, submitUserDetailButton } = style;
@@ -26,17 +27,24 @@ const Login = ({ setIsLoggedIn }) => {
     },
   });
 
-  const [errorMessage, setErrorMessage] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [loginSuccess, setLoginSuccess] = useState(false);
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
 
   const onSubmit: SubmitHandler<AuthSchema> = async (data) => {
-    setErrorMessage("");
-
+    setSnackbarOpen(true);
+    setLoginSuccess(false);
     const response = await loginService(data.username, data.password);
-
+    setLoginSuccess(response.success);
     if (response.success) {
-      setIsLoggedIn(true);
+      setIsLoggedIn(response.accessToken);
+      setSnackbarMessage("Login Success");
     } else {
-      setErrorMessage(response.message);
+      setSnackbarMessage(response.message);
     }
   };
 
@@ -46,12 +54,6 @@ const Login = ({ setIsLoggedIn }) => {
       component="form"
       onSubmit={handleSubmit(onSubmit)}
     >
-      {errorMessage && (
-        <Typography color="error" variant="body2" sx={{ mb: 2 }}>
-          {errorMessage}
-        </Typography>
-      )}
-
       {[
         {
           name: "username",
@@ -90,6 +92,14 @@ const Login = ({ setIsLoggedIn }) => {
       >
         {isSubmitting ? "Submitting..." : "Submit"}
       </ContainedButton>
+      {snackbarMessage && (
+        <CustomSnackbar
+          message={snackbarMessage}
+          open={snackbarOpen}
+          onClose={handleCloseSnackbar}
+          severity={loginSuccess ? "success" : "error"}
+        />
+      )}
     </Box>
   );
 };

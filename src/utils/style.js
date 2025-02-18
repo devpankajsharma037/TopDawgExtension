@@ -73,5 +73,10 @@ let style = {
     display: "block",
     marginLeft: "auto",
   },
+  logoutButton: {
+    position: "absolute",
+    top: "25px",
+    right: "20px",
+  },
 };
 export default style;
