@@ -38,6 +38,7 @@ const Login = ({ setIsLoggedIn }) => {
   const onSubmit: SubmitHandler<AuthSchema> = async (data) => {
     setSnackbarOpen(true);
     setLoginSuccess(false);
+    setSnackbarMessage("");
     const response = await loginService(data.username, data.password);
     setLoginSuccess(response.success);
     if (response.success) {
