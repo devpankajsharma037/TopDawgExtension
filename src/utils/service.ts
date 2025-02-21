@@ -66,6 +66,57 @@ export const userInfoService = async (userInfo: UserInfo) => {
 
     return { success: true, data };
   } catch (error: any) {
+    console.error("API Error:", error.response?.data || error.message);
+    return {
+      success: false,
+      message: error.response?.data?.message || "Request failed.",
+    };
+  }
+};
+
+export const getUserInfo = async (slugId, creatorId) => {
+  try {
+    const token = await getAuthToken();
+
+    const headers = token
+      ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+      : { "Content-Type": "application/json" };
+
+    const { data } = await axios.get(
+      `${API_URL}/info/get/${slugId}/${creatorId}`,
+      {
+        headers,
+      }
+    );
+    return {
+      success: true,
+      data,
+    };
+  } catch (error) {
+    console.error(" API Error:", error.response?.data || error.message);
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        "Error while fetching user information.",
+    };
+  }
+};
+
+export const updateInfoService = async (userInfo: UserInfo) => {
+  try {
+    const token = await getAuthToken();
+
+    const headers = token
+      ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+      : { "Content-Type": "application/json" };
+
+    const { data } = await axios.patch(`${API_URL}/info/update/`, userInfo, {
+      headers,
+    });
+
+    return { success: true, data };
+  } catch (error: any) {
     console.error(" API Error:", error.response?.data || error.message);
     return {
       success: false,

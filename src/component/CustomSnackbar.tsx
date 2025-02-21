@@ -1,40 +1,47 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { Snackbar, Alert } from "@mui/material";
 
-interface SnackbarProps {
+interface SnackbarState {
   message: string;
   open: boolean;
-  onClose: () => void;
-  duration?: number;
-  severity?: any;
+  severity: "success" | "error" | "info" | "warning";
 }
 
-const CustomSnackbar: React.FC<SnackbarProps> = ({
-  message,
-  open,
-  onClose,
-  duration = 3000,
-  severity = "success",
-}) => {
-  useEffect(() => {
-    if (open) {
-      const timer = setTimeout(onClose, duration);
-      return () => clearTimeout(timer);
-    }
-  }, [open, onClose, duration]);
+export function useSnackbar() {
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
+    message: "",
+    open: false,
+    severity: "success",
+  });
 
-  return (
+  const showSuccess = useCallback((message: string) => {
+    setSnackbar({ message, open: true, severity: "success" });
+  }, []);
+
+  const showError = useCallback((message: string) => {
+    setSnackbar({ message, open: true, severity: "error" });
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  }, []);
+
+  const SnackbarComponent = (
     <Snackbar
-      open={open}
-      autoHideDuration={duration}
-      onClose={onClose}
+      open={snackbar.open}
+      autoHideDuration={3000}
+      onClose={handleClose}
       anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
     >
-      <Alert onClose={onClose} severity={severity} sx={{ width: "100%" }}>
-        {message}
+      <Alert
+        onClose={handleClose}
+        severity={snackbar.severity}
+        sx={{ width: "100%" }}
+      >
+        {snackbar.message}
       </Alert>
     </Snackbar>
   );
-};
 
-export default CustomSnackbar;
+  return { showSuccess, showError, SnackbarComponent };
+}
