@@ -9,7 +9,7 @@ import { ContainedButton } from "../../component/Button";
 import FormInput from "../../component/FormInput";
 import { authSchema } from "../../utils/validation";
 import { loginService } from "../../utils/service";
-import CustomSnackbar from "../../component/CustomSnackbar";
+import { useSnackbar } from "../../component/CustomSnackbar";
 
 const Login = ({ setIsLoggedIn }) => {
   const { popupFormLable, popupFormLayout, submitUserDetailButton } = style;
@@ -27,25 +27,15 @@ const Login = ({ setIsLoggedIn }) => {
     },
   });
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [loginSuccess, setLoginSuccess] = useState(false);
-
-  const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
-  };
+  const { showSuccess, showError, SnackbarComponent } = useSnackbar();
 
   const onSubmit: SubmitHandler<AuthSchema> = async (data) => {
-    setSnackbarOpen(true);
-    setLoginSuccess(false);
-    setSnackbarMessage("");
     const response = await loginService(data.username, data.password);
-    setLoginSuccess(response.success);
     if (response.success) {
       setIsLoggedIn(response.accessToken);
-      setSnackbarMessage("Login Success");
+      showSuccess("Login Success");
     } else {
-      setSnackbarMessage(response.message);
+      showError(response.message);
     }
   };
 
@@ -93,14 +83,7 @@ const Login = ({ setIsLoggedIn }) => {
       >
         {isSubmitting ? "Submitting..." : "Submit"}
       </ContainedButton>
-      {snackbarMessage && (
-        <CustomSnackbar
-          message={snackbarMessage}
-          open={snackbarOpen}
-          onClose={handleCloseSnackbar}
-          severity={loginSuccess ? "success" : "error"}
-        />
-      )}
+      {SnackbarComponent}
     </Box>
   );
 };

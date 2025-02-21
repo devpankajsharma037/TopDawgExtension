@@ -14,6 +14,7 @@ import {
   userInfoService,
 } from "../../utils/service";
 import { UserInfo } from "../../utils/types";
+import { useSnackbar } from "../../component/CustomSnackbar";
 
 const UserDetails = () => {
   const { popupFormLable, popupFormLayout, submitUserDetailButton } = style;
@@ -22,7 +23,7 @@ const UserDetails = () => {
   const [creator, setCreator] = useState<string | null>(null);
   const [userInfo, setUserInfo] = useState<any>({});
   const [loading, setLoading] = useState(false);
-  const [update, setUpdate] = useState(false);
+  const { showSuccess, showError, SnackbarComponent } = useSnackbar();
 
   const defaultState = {
     name: "",
@@ -80,7 +81,14 @@ const UserDetails = () => {
 
         if (chrome.runtime.lastError) {
           console.error("Error sending message:", chrome.runtime.lastError);
+          showError("Failed to send request.");
           return;
+        }
+
+        if (response?.success) {
+          showSuccess(userInfo?.id ? "User info updated!" : "User info added!");
+        } else {
+          showError(response?.message || "Something went wrong.");
         }
 
         console.log("Response from background script:", response);
@@ -167,6 +175,7 @@ const UserDetails = () => {
           {loading ? "Submitting..." : "Submit"}
         </ContainedButton>
       )}
+      {SnackbarComponent}
     </Box>
   );
 };
