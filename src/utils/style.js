@@ -6,6 +6,7 @@ let style = {
     height: "600px",
     padding: "0px",
     background: "#000",
+    position: "relative",
   },
   popupLogoGrid: {
     padding: "20px",

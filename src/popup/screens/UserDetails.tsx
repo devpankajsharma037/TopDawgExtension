@@ -8,12 +8,6 @@ import style from "../../utils/style";
 import { ContainedButton } from "../../component/Button";
 import FormInput from "../../component/FormInput";
 import { userDetailsSchema } from "../../utils/validation";
-import {
-  getUserInfo,
-  updateInfoService,
-  userInfoService,
-} from "../../utils/service";
-import { UserInfo } from "../../utils/types";
 import { useSnackbar } from "../../component/CustomSnackbar";
 
 const UserDetails = () => {
@@ -24,7 +18,6 @@ const UserDetails = () => {
   const [userInfo, setUserInfo] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const { showSuccess, showError, SnackbarComponent } = useSnackbar();
-
   const defaultState = {
     name: "",
     age: "",
@@ -45,23 +38,17 @@ const UserDetails = () => {
   });
 
   useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0 && tabs[0].url) {
-        try {
-          const url = new URL(tabs[0].url);
-          const pathSegments = url.pathname.split("/").filter(Boolean);
-          const extractedSlug = pathSegments.pop() || null;
+    function getQueryParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        paramsSlug: params.get("slug"),
+        paramsCreator: params.get("creator"),
+      };
+    }
 
-          const searchParams = new URLSearchParams(url.search);
-          const extractedCreator = searchParams.get("creator");
-
-          setSlug(extractedSlug);
-          setCreator(extractedCreator);
-        } catch (error) {
-          console.error("Error extracting slug and creator:", error);
-        }
-      }
-    });
+    const { paramsSlug, paramsCreator } = getQueryParams();
+    setSlug(paramsSlug);
+    setCreator(paramsCreator);
   }, []);
 
   const onSubmit: SubmitHandler<UserDetailsFormData> = async (data) => {
@@ -80,7 +67,6 @@ const UserDetails = () => {
         setLoading(false);
 
         if (chrome.runtime.lastError) {
-          console.error("Error sending message:", chrome.runtime.lastError);
           showError("Failed to send request.");
           return;
         }
@@ -90,8 +76,6 @@ const UserDetails = () => {
         } else {
           showError(response?.message || "Something went wrong.");
         }
-
-        console.log("Response from background script:", response);
       }
     );
   };
@@ -99,27 +83,27 @@ const UserDetails = () => {
   useEffect(() => {
     if (!slug || !creator) return;
 
-    const fetchUserInformation = async () => {
-      try {
-        const response = await getUserInfo(slug, creator);
-        if (response.success && response.data) {
-          const userData = response?.data?.data;
-          const formattedData = {
-            ...userData,
-            age: userData.age ? String(userData.age) : "",
-          };
-          setUserInfo(formattedData);
-          reset(formattedData);
-        } else {
-          console.error("Failed to fetch user info:", response.message);
+    const fetchUserInformation = () => {
+      chrome.runtime.sendMessage(
+        { action: "getUserInfo", slugId: slug, creatorId: creator },
+        (response) => {
+          if (response?.success && response?.data) {
+            const userData = response.data.data;
+            const formattedData = {
+              ...userData,
+              age: userData.age ? String(userData.age) : "",
+            };
+            setUserInfo(formattedData);
+            reset(formattedData);
+          } else {
+            console.error("Failed to fetch user info:", response?.message);
+          }
         }
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
+      );
     };
 
     fetchUserInformation();
-  }, [slug, creator]);
+  }, [slug, creator, loading]);
 
   return (
     <Box
