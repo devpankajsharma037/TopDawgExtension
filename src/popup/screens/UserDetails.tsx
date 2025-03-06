@@ -9,6 +9,7 @@ import { ContainedButton } from "../../component/Button";
 import FormInput from "../../component/FormInput";
 import { userDetailsSchema } from "../../utils/validation";
 import { useSnackbar } from "../../component/CustomSnackbar";
+import { lightGreen } from "@mui/material/colors";
 
 const UserDetails = () => {
   const { popupFormLable, popupFormLayout, submitUserDetailButton } = style;
@@ -44,12 +45,15 @@ const UserDetails = () => {
       return {
         paramsSlug: params.get("slug"),
         paramsCreator: params.get("creator"),
+        paramsTime: params.get("time"),
       };
     }
 
-    const { paramsSlug, paramsCreator } = getQueryParams();
+    const { paramsSlug, paramsCreator,paramsTime} = getQueryParams();
     setSlug(paramsSlug);
     setCreator(paramsCreator);
+    console.log(paramsTime,'paramsTime');
+    
   }, []);
 
   const onSubmit: SubmitHandler<UserDetailsFormData> = async (data) => {
@@ -122,6 +126,18 @@ const UserDetails = () => {
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if(message.action === 'updateParams'){
+      let {newSlug,newCreator} =  message
+      if (slug !== null && creator !== null ){
+        if (newSlug !== slug || newCreator !== creator){
+          setCreator(newCreator)
+          setSlug(newSlug)
+        }
+      }
+    }
+  });
 
   return (
     <Box
