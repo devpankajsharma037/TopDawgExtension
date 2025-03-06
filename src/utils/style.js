@@ -2,9 +2,10 @@ let fontFamily_ = "Inter_800";
 
 let style = {
   popupContainerMain: {
-    width: "450px",
-    height: "600px",
+    width: "100%",
+    height: "100%",
     padding: "0px",
+    maxWidth: "1000px",
     background: "#000",
     position: "relative",
   },

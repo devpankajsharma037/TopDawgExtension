@@ -18,6 +18,7 @@ const UserDetails = () => {
   const [userInfo, setUserInfo] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const { showSuccess, showError, SnackbarComponent } = useSnackbar();
+  const [rows, setRows] = useState(4);
   const defaultState = {
     name: "",
     age: "",
@@ -105,6 +106,23 @@ const UserDetails = () => {
     fetchUserInformation();
   }, [slug, creator, loading]);
 
+  const calculateRows = () => {
+    const screenHeight = window.innerHeight;
+    const baseHeight = 600;
+    const baseRows = 6;
+    const rows = Math.ceil(screenHeight / (baseHeight / baseRows));
+    return Math.max(5, rows);
+  };
+
+  useEffect(() => {
+    const handleResize = () => setRows(calculateRows());
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <Box
       sx={popupFormLayout}
@@ -122,7 +140,7 @@ const UserDetails = () => {
           label: "Notes",
           placeholder: "Write your notes here",
           multiline: true,
-          rows: 4,
+          rows: rows,
         },
       ].map(({ name, label, placeholder, multiline, rows }) => (
         <Grid container key={name} spacing={2} alignItems="flex-start">
