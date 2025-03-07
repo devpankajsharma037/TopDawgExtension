@@ -10,6 +10,8 @@ export const userDetailsSchema = z.object({
   age: z.string().optional(),
   custom: z.string().optional(),
   notes: z.string().optional(),
+  location:z.string().optional(),
+  job:z.string().optional(),
 });
 
 export const authSchema = z.object({

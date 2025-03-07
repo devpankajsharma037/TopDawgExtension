@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { object, z } from "zod";
 import Grid from "@mui/material/Grid2";
 import { Box, Typography } from "@mui/material";
 import style from "../../utils/style";
@@ -58,10 +58,7 @@ const UserDetails = () => {
 
   const onSubmit: SubmitHandler<UserDetailsFormData> = async (data) => {
     setLoading(true);
-
-    const payload = userInfo?.id
-      ? { id: userInfo.id, ...data }
-      : { ...data, slug_id: slug, creater_id: creator };
+    const payload = userInfo?.id ? { id: userInfo.id, ...data } : { ...data, slug_id: slug, creater_id: creator };
 
     chrome.runtime.sendMessage(
       {
@@ -70,7 +67,6 @@ const UserDetails = () => {
       },
       (response) => {
         setLoading(false);
-
         if (chrome.runtime.lastError) {
           showError("Failed to send request.");
           return;
@@ -94,12 +90,14 @@ const UserDetails = () => {
         (response) => {
           if (response?.success && response?.data) {
             const userData = response.data.data;
-            const formattedData = {
-              ...userData,
-              age: userData.age ? String(userData.age) : "",
-            };
-            setUserInfo(formattedData);
-            reset(formattedData);
+            const formattedData = {...userData,age: userData.age ? String(userData.age) : "",};
+            if (Object.keys(userData).length > 0){
+              setUserInfo(formattedData);
+              reset(formattedData);
+            } else {
+              setUserInfo(defaultState);
+              reset(defaultState); 
+            }
           } else {
             console.error("Failed to fetch user info:", response?.message);
           }
@@ -151,13 +149,7 @@ const UserDetails = () => {
         { name: "location", label: "Location", placeholder: "Location" },
         { name: "job", label: "Job", placeholder: "Job" },
         { name: "custom", label: "Custom", placeholder: "Custom requests" },
-        {
-          name: "notes",
-          label: "Notes",
-          placeholder: "Write your notes here",
-          multiline: true,
-          rows: rows,
-        },
+        { name: "notes", label: "Notes", placeholder: "Write your notes here", multiline: true,rows: rows,},
       ].map(({ name, label, placeholder, multiline, rows }) => (
         <Grid container key={name} spacing={2} alignItems="flex-start">
           <Grid size={3}>

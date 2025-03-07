@@ -61,8 +61,7 @@ chrome.action.onClicked.addListener(() => {
         const popupUrl = chrome.runtime.getURL(
           `popup.html?slug=${encodeURIComponent(extractedSlug)}&creator=${encodeURIComponent(extractedCreator)}&time=${realtimeParam}`
         );
-
-        if (extractedSlug && extractedCreator) {
+        if (extractedSlug && extractedCreator && extractedSlug.indexOf('-') > -1) {
           chrome.windows.create(
             {
               url: popupUrl,
