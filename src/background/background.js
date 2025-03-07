@@ -62,17 +62,22 @@ chrome.action.onClicked.addListener(() => {
           `popup.html?slug=${encodeURIComponent(extractedSlug)}&creator=${encodeURIComponent(extractedCreator)}&time=${realtimeParam}`
         );
         if (extractedSlug && extractedCreator && extractedSlug.indexOf('-') > -1) {
-          chrome.windows.create(
-            {
-              url: popupUrl,
-              type: "popup",
-              width: 600,
-              height: 700,
-            },
-            (window) => {
-              popupWindowId = window.id;
-            }
-        );
+
+          if (popupWindowId !== null){
+            chrome.windows.update(popupWindowId)
+          } else {
+            chrome.windows.create(
+              {
+                url: popupUrl,
+                type: "popup",
+                width: 600,
+                height: 700,
+              },
+              (window) => {
+                popupWindowId = window.id;
+              }
+            );
+          }
         }
       } catch (error) {
         console.error("Error extracting slug and creator:", error);
